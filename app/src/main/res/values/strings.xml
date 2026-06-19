@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SkyTrace</string>
+    <string name="location_permission_rationale">SkyTrace needs your location to calculate accurate positions of celestial objects in your sky.</string>
+    <string name="camera_permission_rationale">SkyTrace needs camera access to capture observation images.</string>
+    <string name="storage_permission_rationale">SkyTrace needs storage access to load your telescope images for analysis.</string>
+</resources>

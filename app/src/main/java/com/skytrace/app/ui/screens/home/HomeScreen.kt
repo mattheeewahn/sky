@@ -43,19 +43,26 @@ fun HomeScreen(
 
     LaunchedEffect(locationPermission.status.isGranted) {
         if (locationPermission.status.isGranted) {
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
             try {
+                val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     location?.let {
                         viewModel.updateLocation(
                             ObserverLocation(it.latitude, it.longitude, it.altitude)
                         )
+                    } ?: run {
+                        // No last known location, use default
+                        viewModel.updateLocation(ObserverLocation(37.5665, 126.9780, 0.0))
                     }
+                }.addOnFailureListener {
+                    viewModel.updateLocation(ObserverLocation(37.5665, 126.9780, 0.0))
                 }
-            } catch (e: SecurityException) {
-                // Location permission not granted
+            } catch (e: Exception) {
+                viewModel.updateLocation(ObserverLocation(37.5665, 126.9780, 0.0))
             }
         } else {
+            // Load with default location (Seoul) before permission
+            viewModel.updateLocation(ObserverLocation(37.5665, 126.9780, 0.0))
             locationPermission.launchPermissionRequest()
         }
     }

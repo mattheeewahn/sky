@@ -173,7 +173,7 @@ private fun CandidateRow(candidate: AsteroidCandidate, onVerify: () -> Unit) {
             // Verification result
             candidate.verificationResult?.let { result ->
                 Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(color = TextTertiary.copy(alpha = 0.3f))
+                Divider(color = TextTertiary.copy(alpha = 0.3f))
                 Spacer(modifier = Modifier.height(8.dp))
 
                 result.bestAsteroidMatch?.let { match ->

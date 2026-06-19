@@ -3,6 +3,7 @@ package com.skytrace.app.data.remote.parser
 import com.google.gson.JsonParser
 import com.skytrace.app.domain.model.CelestialObject
 import com.skytrace.app.domain.model.ObjectType
+import kotlin.math.*
 
 /**
  * Parser for Minor Planet Center API responses.
@@ -123,41 +124,40 @@ object MpcParser {
     fun orbitToApproxPosition(orbit: MpcOrbit, jd: Double): Pair<Double, Double>? {
         if (orbit.semiMajorAxis <= 0 || orbit.eccentricity >= 1.0) return null
 
-        val n = 0.9856076686 / (orbit.semiMajorAxis * sqrt(orbit.semiMajorAxis)) // deg/day
-        val daysSinceEpoch = jd - orbit.epoch
-        val m = Math.toRadians((orbit.meanAnomaly + n * daysSinceEpoch) % 360.0)
+        val n: Double = 0.9856076686 / (orbit.semiMajorAxis * sqrt(orbit.semiMajorAxis))
+        val daysSinceEpoch: Double = jd - orbit.epoch
+        val m: Double = Math.toRadians((orbit.meanAnomaly + n * daysSinceEpoch) % 360.0)
 
         // Solve Kepler
-        var e = m
+        var ea: Double = m
         for (i in 0..10) {
-            val de = (e - orbit.eccentricity * sin(e) - m) / (1 - orbit.eccentricity * cos(e))
-            e -= de
-            if (kotlin.math.abs(de) < 1e-10) break
+            val de: Double = (ea - orbit.eccentricity * sin(ea) - m) / (1.0 - orbit.eccentricity * cos(ea))
+            ea -= de
+            if (abs(de) < 1e-10) break
         }
 
-        val trueAnomaly = 2.0 * atan2(
-            sqrt(1 + orbit.eccentricity) * sin(e / 2),
-            sqrt(1 - orbit.eccentricity) * cos(e / 2)
+        val trueAnomaly: Double = 2.0 * atan2(
+            sqrt(1.0 + orbit.eccentricity) * sin(ea / 2.0),
+            sqrt(1.0 - orbit.eccentricity) * cos(ea / 2.0)
         )
-        val r = orbit.semiMajorAxis * (1 - orbit.eccentricity * cos(e))
+        val r: Double = orbit.semiMajorAxis * (1.0 - orbit.eccentricity * cos(ea))
 
-        val omega = Math.toRadians(orbit.argPerihelion)
-        val node = Math.toRadians(orbit.longAscNode)
-        val incl = Math.toRadians(orbit.inclination)
+        val omega: Double = Math.toRadians(orbit.argPerihelion)
+        val node: Double = Math.toRadians(orbit.longAscNode)
+        val incl: Double = Math.toRadians(orbit.inclination)
 
-        val xHelio = r * (cos(node) * cos(omega + trueAnomaly) - sin(node) * sin(omega + trueAnomaly) * cos(incl))
-        val yHelio = r * (sin(node) * cos(omega + trueAnomaly) + cos(node) * sin(omega + trueAnomaly) * cos(incl))
-        val zHelio = r * sin(omega + trueAnomaly) * sin(incl)
+        val xHelio: Double = r * (cos(node) * cos(omega + trueAnomaly) - sin(node) * sin(omega + trueAnomaly) * cos(incl))
+        val yHelio: Double = r * (sin(node) * cos(omega + trueAnomaly) + cos(node) * sin(omega + trueAnomaly) * cos(incl))
+        val zHelio: Double = r * sin(omega + trueAnomaly) * sin(incl)
 
-        // Very simplified geocentric conversion (ignores Earth position properly)
-        // For proper results, subtract Earth's heliocentric position
-        val obliquity = Math.toRadians(23.439)
-        val xEq = xHelio
-        val yEq = yHelio * cos(obliquity) - zHelio * sin(obliquity)
-        val zEq = yHelio * sin(obliquity) + zHelio * cos(obliquity)
+        val obliquity: Double = Math.toRadians(23.439)
+        val xEq: Double = xHelio
+        val yEq: Double = yHelio * cos(obliquity) - zHelio * sin(obliquity)
+        val zEq: Double = yHelio * sin(obliquity) + zHelio * cos(obliquity)
 
-        val ra = (atan2(yEq, xEq) * 12.0 / PI).let { if (it < 0) it + 24.0 else it }
-        val dec = atan2(zEq, sqrt(xEq * xEq + yEq * yEq)) * 180.0 / PI
+        var ra: Double = atan2(yEq, xEq) * 12.0 / PI
+        if (ra < 0) ra += 24.0
+        val dec: Double = atan2(zEq, sqrt(xEq * xEq + yEq * yEq)) * 180.0 / PI
 
         return Pair(ra, dec)
     }

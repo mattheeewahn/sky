@@ -213,7 +213,7 @@ fun BlinkScreen(
                     uiState.markedX?.let { x ->
                         uiState.markedY?.let { y ->
                             Spacer(modifier = Modifier.height(8.dp))
-                            HorizontalDivider(color = TextTertiary.copy(alpha = 0.3f))
+                            Divider(color = TextTertiary.copy(alpha = 0.3f))
                             Spacer(modifier = Modifier.height(8.dp))
                             Text("Marked Position: (${x.toInt()}, ${y.toInt()}) px", color = AccentBlue, fontSize = 12.sp)
                         }

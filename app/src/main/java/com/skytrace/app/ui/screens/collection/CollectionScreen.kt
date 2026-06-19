@@ -126,7 +126,7 @@ private fun CategoryProgress(label: String, observed: Int, total: Int) {
             }
             Spacer(modifier = Modifier.height(6.dp))
             LinearProgressIndicator(
-                progress = { progress },
+                progress = progress,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)

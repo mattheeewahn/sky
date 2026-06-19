@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -298,7 +299,7 @@ private fun ObjectDetailSheet(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider(color = TextTertiary.copy(alpha = 0.3f))
+        Divider(color = TextTertiary.copy(alpha = 0.3f))
         Spacer(modifier = Modifier.height(16.dp))
 
         // Position data

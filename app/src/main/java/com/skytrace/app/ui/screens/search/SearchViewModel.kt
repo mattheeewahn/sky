@@ -7,6 +7,7 @@ import com.skytrace.app.domain.model.CelestialObject
 import com.skytrace.app.domain.model.ObjectType
 import com.skytrace.app.domain.model.ObserverLocation
 import com.skytrace.app.services.sky.MessierCatalog
+import com.skytrace.app.services.sky.NgcCatalog
 import com.skytrace.app.services.sky.StarCatalog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -39,6 +40,7 @@ class SearchViewModel @Inject constructor(
         val list = mutableListOf<CelestialObject>()
         list.addAll(StarCatalog.toCelestialObjects())
         list.addAll(MessierCatalog.toCelestialObjects())
+        list.addAll(NgcCatalog.toCelestialObjects())
         // Planets
         list.add(CelestialObject("planet_mercury", "Mercury", type = ObjectType.PLANET, rightAscension = 0.0, declination = 0.0, magnitude = -0.4))
         list.add(CelestialObject("planet_venus", "Venus", type = ObjectType.PLANET, rightAscension = 0.0, declination = 0.0, magnitude = -4.4))

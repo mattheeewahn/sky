@@ -1,5 +1,8 @@
 package com.skytrace.app.ui.screens.blink
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -30,6 +33,15 @@ fun BlinkScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    // File picker for multiple images
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        uris.forEach { uri ->
+            viewModel.addImageUri(uri.toString())
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,7 +60,7 @@ fun BlinkScreen(
                 }
                 Text("Image Blink", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
             }
-            IconButton(onClick = { viewModel.addImage() }) {
+            IconButton(onClick = { imagePickerLauncher.launch("image/*") }) {
                 Icon(Icons.Default.Add, "Add Image", tint = AccentBlue)
             }
         }
@@ -68,7 +80,7 @@ fun BlinkScreen(
                     Text("Add 2+ images to start blinking", color = TextTertiary, fontSize = 13.sp)
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        onClick = { viewModel.addImage() },
+                        onClick = { imagePickerLauncher.launch("image/*") },
                         colors = ButtonDefaults.buttonColors(containerColor = AccentBlue)
                     ) {
                         Icon(Icons.Default.Add, null, modifier = Modifier.size(18.dp))

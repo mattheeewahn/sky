@@ -119,6 +119,29 @@ class SkyRepository @Inject constructor() {
                 )
             }
 
+        // NGC objects (built-in bright subset)
+        NgcCatalog.objects
+            .filter { it.magnitude <= magnitudeLimit }
+            .forEach { ngc ->
+                val (alt, az) = AstronomyEngine.equatorialToHorizontal(ngc.ra, ngc.dec, location.latitude, lstDeg)
+                objects.add(
+                    CelestialObject(
+                        id = "ngc_${ngc.number}",
+                        name = ngc.name?.let { "NGC ${ngc.number} - $it" } ?: "NGC ${ngc.number}",
+                        catalogId = "NGC ${ngc.number}",
+                        type = ObjectType.NGC,
+                        rightAscension = ngc.ra,
+                        declination = ngc.dec,
+                        magnitude = ngc.magnitude,
+                        altitude = alt,
+                        azimuth = az,
+                        isVisible = alt > 0,
+                        constellation = ngc.constellation,
+                        description = ngc.type
+                    )
+                )
+            }
+
         return objects
     }
 

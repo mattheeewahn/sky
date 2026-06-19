@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Play Store required strings -->
+    <string name="privacy_policy_url">https://github.com/mattheeewahn/sky/blob/main/PRIVACY.md</string>
+    <string name="app_description">SkyTrace is a practical astronomy observation app for amateur astronomers. Locate celestial objects, track satellites, record observations, and verify asteroid candidates.</string>
+    
+    <!-- Permission rationales (Play Store requirement) -->
+    <string name="permission_location_rationale">Your location is used to calculate accurate positions of stars, planets, and satellites in your local sky. Location data stays on your device and is never uploaded.</string>
+    <string name="permission_camera_rationale">Camera access allows you to capture telescope images for observation records and asteroid candidate analysis.</string>
+    <string name="permission_storage_rationale">Storage access is needed to load your telescope images for blink comparison and observation logs.</string>
+</resources>

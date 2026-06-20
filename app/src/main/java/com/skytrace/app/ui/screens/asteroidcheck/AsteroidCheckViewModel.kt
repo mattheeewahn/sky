@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -124,15 +125,14 @@ class AsteroidCheckViewModel @Inject constructor(
 
         // Check satellites via TLE propagation
         // Compare candidate position against known satellite positions at observation time
-        val satellites = mutableListOf<TLEData>()
-        satelliteRepository.getAllSatellites().collect { sats ->
-            satellites.addAll(sats)
-        }
-
-        // Simple check: see if any satellite was near this RA/Dec at observation time
-        for (sat in satellites.take(100)) {
-            // Simplified: in production, propagate TLE to observation time and compare
-            // This placeholder shows the architecture is in place
+        try {
+            val satellites = satelliteRepository.getAllSatellites().first()
+            // Simple check: see if any satellite was near this RA/Dec at observation time
+            for (sat in satellites.take(100)) {
+                // Simplified: in production, propagate TLE to observation time and compare
+            }
+        } catch (e: Exception) {
+            // No satellite data available, continue
         }
 
         val noKnownMatch = bestAsteroid == null && bestSatellite == null
@@ -146,9 +146,9 @@ class AsteroidCheckViewModel @Inject constructor(
 
     private fun determineStatus(result: VerificationResult): CandidateStatus {
         return when {
-            result.bestAsteroidMatch != null && (result.bestAsteroidMatch.confidencePercent ?: 0) > 70 ->
+            result.bestAsteroidMatch != null && result.bestAsteroidMatch.confidencePercent > 70 ->
                 CandidateStatus.LIKELY_KNOWN_ASTEROID
-            result.bestSatelliteMatch != null && (result.bestSatelliteMatch.confidencePercent ?: 0) > 70 ->
+            result.bestSatelliteMatch != null && result.bestSatelliteMatch.confidencePercent > 70 ->
                 CandidateStatus.LIKELY_SATELLITE
             result.noKnownMatch -> CandidateStatus.UNKNOWN_CANDIDATE
             else -> CandidateStatus.NEEDS_FOLLOWUP

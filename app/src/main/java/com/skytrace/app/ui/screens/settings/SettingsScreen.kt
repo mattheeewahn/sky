@@ -119,12 +119,12 @@ fun SettingsScreen(
         SettingsSection("Data") {
             SettingsRow("Export Observations (CSV)") {
                 IconButton(onClick = { viewModel.exportCsv() }) {
-                    Icon(Icons.Default.FileDownload, "Export", tint = AccentBlue)
+                    Icon(Icons.Default.Download, "Export", tint = AccentBlue)
                 }
             }
             SettingsRow("Export Observations (JSON)") {
                 IconButton(onClick = { viewModel.exportJson() }) {
-                    Icon(Icons.Default.FileDownload, "Export", tint = AccentBlue)
+                    Icon(Icons.Default.Download, "Export", tint = AccentBlue)
                 }
             }
             SettingsRow("Clear Cache", subtitle = "Remove downloaded catalog data") {

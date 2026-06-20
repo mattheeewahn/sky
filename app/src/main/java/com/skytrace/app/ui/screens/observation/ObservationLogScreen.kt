@@ -48,7 +48,7 @@ fun ObservationLogScreen(
             }
             Row {
                 IconButton(onClick = { viewModel.exportCsv() }) {
-                    Icon(Icons.Default.FileDownload, "Export CSV", tint = TextSecondary)
+                    Icon(Icons.Default.Download, "Export CSV", tint = TextSecondary)
                 }
                 FloatingActionButton(
                     onClick = { navController.navigate("observations/add?objectName=&objectType=") },
@@ -101,7 +101,7 @@ fun ObservationLogScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.NoteAlt, "No observations", tint = TextTertiary, modifier = Modifier.size(48.dp))
+                    Icon(Icons.Default.EditNote, "No observations", tint = TextTertiary, modifier = Modifier.size(48.dp))
                     Spacer(modifier = Modifier.height(12.dp))
                     Text("No observations yet", color = TextSecondary)
                     Text("Tap + to add your first observation", color = TextTertiary, fontSize = 13.sp)

@@ -99,7 +99,7 @@ fun AsteroidCheckScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.Radar, "No candidates", tint = TextTertiary, modifier = Modifier.size(48.dp))
+                        Icon(Icons.Default.TrackChanges, "No candidates", tint = TextTertiary, modifier = Modifier.size(48.dp))
                         Spacer(modifier = Modifier.height(12.dp))
                         Text("No asteroid candidates", color = TextSecondary)
                         Text("Tap + to report a suspected moving object", color = TextTertiary, fontSize = 13.sp)
@@ -173,7 +173,7 @@ private fun CandidateRow(candidate: AsteroidCandidate, onVerify: () -> Unit) {
             // Verification result
             candidate.verificationResult?.let { result ->
                 Spacer(modifier = Modifier.height(8.dp))
-                Divider(color = TextTertiary.copy(alpha = 0.3f))
+                HorizontalDivider(color = TextTertiary.copy(alpha = 0.3f))
                 Spacer(modifier = Modifier.height(8.dp))
 
                 result.bestAsteroidMatch?.let { match ->

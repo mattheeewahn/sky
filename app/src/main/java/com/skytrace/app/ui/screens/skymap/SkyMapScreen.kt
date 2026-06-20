@@ -50,8 +50,8 @@ fun SkyMapScreen(
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
     // Sensor setup for compass
-    var azimuth by remember { mutableFloatStateOf(0f) }
-    var pitch by remember { mutableFloatStateOf(0f) }
+    var azimuth by remember { mutableStateOf(0f) }
+    var pitch by remember { mutableStateOf(0f) }
 
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -306,7 +306,7 @@ private fun ObjectDetailSheet(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Divider(color = TextTertiary.copy(alpha = 0.3f))
+        HorizontalDivider(color = TextTertiary.copy(alpha = 0.3f))
         Spacer(modifier = Modifier.height(16.dp))
 
         // Position data
@@ -366,7 +366,7 @@ private fun ObjectDetailSheet(
                 onClick = onLogObservation,
                 modifier = Modifier.weight(1f)
             ) {
-                Icon(Icons.Default.NoteAlt, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.EditNote, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(6.dp))
                 Text("Log")
             }

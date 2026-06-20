@@ -38,8 +38,8 @@ fun TelescopePointingScreen(
     }
 
     // Sensor listening
-    var currentAz by remember { mutableFloatStateOf(0f) }
-    var currentAlt by remember { mutableFloatStateOf(0f) }
+    var currentAz by remember { mutableStateOf(0f) }
+    var currentAlt by remember { mutableStateOf(0f) }
 
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager

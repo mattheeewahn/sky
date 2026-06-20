@@ -123,10 +123,10 @@ private fun SearchResultRow(obj: CelestialObject, onClick: () -> Unit) {
                 ObjectType.PLANET -> Icons.Default.Public
                 ObjectType.STAR -> Icons.Default.Star
                 ObjectType.MESSIER, ObjectType.NGC -> Icons.Default.Lens
-                ObjectType.SATELLITE -> Icons.Default.Satellite
-                ObjectType.ASTEROID -> Icons.Default.Radar
+                ObjectType.SATELLITE -> Icons.Default.Wifi
+                ObjectType.ASTEROID -> Icons.Default.TrackChanges
                 ObjectType.MOON -> Icons.Default.NightsStay
-                else -> Icons.Default.Circle
+                else -> Icons.Default.RadioButtonUnchecked
             }
             Icon(icon, contentDescription = null, tint = AccentBlue, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(12.dp))

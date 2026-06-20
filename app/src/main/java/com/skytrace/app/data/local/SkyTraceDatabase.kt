@@ -11,9 +11,10 @@ import com.skytrace.app.data.local.entity.*
         CollectionEntity::class,
         AsteroidCandidateEntity::class,
         SatelliteTleEntity::class,
-        CatalogCacheEntity::class
+        CatalogCacheEntity::class,
+        StarMessageEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class SkyTraceDatabase : RoomDatabase() {
@@ -22,4 +23,5 @@ abstract class SkyTraceDatabase : RoomDatabase() {
     abstract fun asteroidCandidateDao(): AsteroidCandidateDao
     abstract fun satelliteTleDao(): SatelliteTleDao
     abstract fun catalogCacheDao(): CatalogCacheDao
+    abstract fun starMessageDao(): StarMessageDao
 }

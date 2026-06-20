@@ -15,6 +15,7 @@ import com.skytrace.app.ui.screens.observation.AddObservationScreen
 import com.skytrace.app.ui.screens.search.SearchScreen
 import com.skytrace.app.ui.screens.settings.SettingsScreen
 import com.skytrace.app.ui.screens.skymap.SkyMapScreen
+import com.skytrace.app.ui.screens.starmessage.StarMessageScreen
 import com.skytrace.app.ui.screens.telescope.TelescopePointingScreen
 
 sealed class Screen(val route: String) {
@@ -26,6 +27,7 @@ sealed class Screen(val route: String) {
     data object Collection : Screen("collection")
     data object AsteroidCheck : Screen("asteroid_check")
     data object Blink : Screen("blink")
+    data object StarMessage : Screen("star_message")
     data object TelescopePointing : Screen("telescope/{objectId}")
     data object Settings : Screen("settings")
 }
@@ -69,6 +71,9 @@ fun SkyTraceNavHost(navController: NavHostController) {
         }
         composable(Screen.Blink.route) {
             BlinkScreen(navController = navController)
+        }
+        composable(Screen.StarMessage.route) {
+            StarMessageScreen(navController = navController)
         }
         composable(
             route = "telescope/{objectId}",

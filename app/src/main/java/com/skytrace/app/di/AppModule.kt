@@ -44,7 +44,7 @@ object AppModule {
             context,
             SkyTraceDatabase::class.java,
             "skytrace.db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     // DAOs
@@ -53,6 +53,7 @@ object AppModule {
     @Provides fun provideAsteroidCandidateDao(db: SkyTraceDatabase): AsteroidCandidateDao = db.asteroidCandidateDao()
     @Provides fun provideSatelliteTleDao(db: SkyTraceDatabase): SatelliteTleDao = db.satelliteTleDao()
     @Provides fun provideCatalogCacheDao(db: SkyTraceDatabase): CatalogCacheDao = db.catalogCacheDao()
+    @Provides fun provideStarMessageDao(db: SkyTraceDatabase): StarMessageDao = db.starMessageDao()
 
     // API Services
     @Provides

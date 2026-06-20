@@ -227,8 +227,8 @@ private fun QuickActionsRow(navController: NavController) {
         QuickActionButton("Search", Icons.Default.Search, Modifier.weight(1f)) {
             navController.navigate(Screen.Search.route)
         }
-        QuickActionButton("Asteroid", Icons.Default.TrackChanges, Modifier.weight(1f)) {
-            navController.navigate(Screen.AsteroidCheck.route)
+        QuickActionButton("Send", Icons.Default.Send, Modifier.weight(1f)) {
+            navController.navigate(Screen.StarMessage.route)
         }
         QuickActionButton("Log", Icons.Default.EditNote, Modifier.weight(1f)) {
             navController.navigate(Screen.ObservationLog.route)

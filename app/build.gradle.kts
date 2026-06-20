@@ -110,12 +110,6 @@ dependencies {
     // Image loading
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-    // Work Manager for background sync
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
-    implementation("androidx.hilt:hilt-work:1.1.0")
-    ksp("androidx.hilt:hilt-compiler:1.1.0")
-    implementation("androidx.startup:startup-runtime:1.1.1")
-
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
 

@@ -1,6 +1,7 @@
 package com.skytrace.app.ui.screens.starmessage
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,6 +49,7 @@ fun StarMessageScreen(
             MessageStep.CONFIRM -> ConfirmStep(uiState, viewModel)
             MessageStep.TRANSMITTING -> TransmittingStep(uiState)
             MessageStep.CERTIFICATE -> CertificateStep(uiState, viewModel)
+            MessageStep.TRACKING -> TrackingStep(uiState, viewModel)
         }
     }
 }
@@ -111,7 +116,7 @@ private fun TargetStep(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 items(uiState.sentMessages.take(5)) { msg ->
-                    SentMessageRow(msg)
+                    SentMessageRow(msg, onClick = { viewModel.viewTracking(msg) })
                 }
             }
         }
@@ -119,10 +124,10 @@ private fun TargetStep(
 }
 
 @Composable
-private fun SentMessageRow(msg: StarMessage) {
+private fun SentMessageRow(msg: StarMessage, onClick: () -> Unit = {}) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Surface),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(msg.status.emoji, fontSize = 16.sp)
@@ -134,9 +139,7 @@ private fun SentMessageRow(msg: StarMessage) {
                     color = TextTertiary, fontSize = 11.sp
                 )
             }
-            msg.certificateId?.let {
-                Text(it, color = AccentBlue, fontSize = 10.sp)
-            }
+            Icon(Icons.Default.ChevronRight, "View", tint = TextTertiary, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -387,5 +390,197 @@ private fun CertificateStep(uiState: StarMessageUiState, viewModel: StarMessageV
         ) {
             Text("Send Another", fontSize = 15.sp)
         }
+    }
+}
+
+@Composable
+private fun TrackingStep(uiState: StarMessageUiState, viewModel: StarMessageViewModel) {
+    val msg = uiState.trackingMessage ?: return
+    val progress = viewModel.getJourneyProgress(msg)
+    val distanceTraveled = viewModel.getDistanceTraveled(msg)
+    val totalDistance = msg.distanceLightYears ?: 0.0
+    val remaining = totalDistance - distanceTraveled
+
+    // Pulsing dot animation
+    val infiniteTransition = rememberInfiniteTransition(label = "dot")
+    val dotAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.5f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
+        label = "dotAlpha"
+    )
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState())
+    ) {
+        // Header
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { viewModel.backFromTracking() }) {
+                Icon(Icons.Default.ArrowBack, "Back", tint = TextPrimary)
+            }
+            Text("Message Journey", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Journey visualization: Earth ----•---- Star
+        Card(
+            colors = CardDefaults.cardColors(containerColor = DarkNavy),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Earth and Star labels
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("🌍", fontSize = 28.sp)
+                    Text(msg.targetName, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                    Text("⭐", fontSize = 28.sp)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Progress line with dot
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(40.dp)
+                ) {
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        val lineY = size.height / 2
+
+                        // Dashed background line
+                        drawLine(
+                            color = Color(0xFF3A4A5A),
+                            start = Offset(0f, lineY),
+                            end = Offset(size.width, lineY),
+                            strokeWidth = 2f,
+                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 6f))
+                        )
+
+                        // Traveled line (solid)
+                        val progressX = (size.width * progress).toFloat()
+                        if (progressX > 0) {
+                            drawLine(
+                                color = Color(0xFF4A8FE7),
+                                start = Offset(0f, lineY),
+                                end = Offset(progressX, lineY),
+                                strokeWidth = 3f
+                            )
+                        }
+
+                        // Message dot
+                        drawCircle(
+                            color = Color(0xFF4A8FE7).copy(alpha = dotAlpha),
+                            radius = 8f,
+                            center = Offset(progressX.coerceIn(8f, size.width - 8f), lineY)
+                        )
+                        // Inner dot
+                        drawCircle(
+                            color = Color.White,
+                            radius = 3f,
+                            center = Offset(progressX.coerceIn(8f, size.width - 8f), lineY)
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Earth", color = TextTertiary, fontSize = 11.sp)
+                    Text(msg.targetName, color = TextTertiary, fontSize = 11.sp)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Stats
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Surface),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                StatRow("Distance traveled", viewModel.formatDistance(distanceTraveled))
+                Spacer(modifier = Modifier.height(10.dp))
+                StatRow("Total distance", viewModel.formatDistance(totalDistance))
+                Spacer(modifier = Modifier.height(10.dp))
+                StatRow("Remaining", viewModel.formatDistance(remaining.coerceAtLeast(0.0)))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                val arrivalText = if (msg.estimatedArrivalYears != null) {
+                    val years = msg.estimatedArrivalYears
+                    when {
+                        years < 0.001 -> "${(years * 365.25 * 24 * 60).toInt()} minutes"
+                        years < 1 -> "${(years * 365.25).toInt()} days"
+                        years < 1000 -> "${years.toInt()} years"
+                        years < 1000000 -> "${(years / 1000).toInt()},000 years"
+                        else -> "${(years / 1000000).toInt()} million years"
+                    }
+                } else "Unknown"
+                StatRow("Estimated arrival", arrivalText)
+
+                Spacer(modifier = Modifier.height(10.dp))
+                StatRow("Progress", "${String.format("%.10f", progress * 100)}%")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Message preview
+        Card(
+            colors = CardDefaults.cardColors(containerColor = DarkNavy),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Message", color = TextTertiary, fontSize = 11.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("\"${msg.message}\"", color = TextSecondary, fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Column {
+                        Text("From", color = TextTertiary, fontSize = 11.sp)
+                        Text(msg.senderName, color = TextPrimary, fontSize = 13.sp)
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text("Certificate", color = TextTertiary, fontSize = 11.sp)
+                        Text(msg.certificateId ?: "", color = AccentBlue, fontSize = 13.sp)
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Fun fact
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Surface),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
+                Text("💡", fontSize = 14.sp)
+                Spacer(modifier = Modifier.width(8.dp))
+                val fact = when {
+                    totalDistance > 1000000 -> "Your message will outlive the Sun, which has about 5 billion years left."
+                    totalDistance > 1000 -> "Your message is traveling faster than anything humans have ever built."
+                    totalDistance > 10 -> "If you started walking now, it would take ${(totalDistance * 268770000).toLong()} years to walk there."
+                    else -> "Your message is moving at 299,792 km/s — the fastest speed possible."
+                }
+                Text(fact, color = TextSecondary, fontSize = 12.sp, lineHeight = 18.sp)
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, color = TextSecondary, fontSize = 13.sp)
+        Text(value, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
     }
 }

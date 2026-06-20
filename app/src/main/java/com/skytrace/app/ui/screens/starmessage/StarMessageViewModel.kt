@@ -24,6 +24,7 @@ data class StarMessageUiState(
     val selectedTier: MessageTier = MessageTier.MESSAGE,
     val sentMessages: List<StarMessage> = emptyList(),
     val currentTransmission: StarMessage? = null,
+    val trackingMessage: StarMessage? = null,
     val transmissionProgress: Float = 0f,
     val isTransmitting: Boolean = false,
     val searchQuery: String = "",
@@ -36,7 +37,8 @@ enum class MessageStep {
     COMPOSE,
     CONFIRM,
     TRANSMITTING,
-    CERTIFICATE
+    CERTIFICATE,
+    TRACKING
 }
 
 @HiltViewModel
@@ -224,5 +226,49 @@ class StarMessageViewModel @Inject constructor(
             totalSent = _uiState.value.totalSent,
             searchResults = popularTargets
         )
+    }
+
+    fun viewTracking(msg: StarMessage) {
+        _uiState.value = _uiState.value.copy(step = MessageStep.TRACKING, trackingMessage = msg)
+    }
+
+    fun backFromTracking() {
+        _uiState.value = _uiState.value.copy(step = MessageStep.SELECT_TARGET, trackingMessage = null)
+    }
+
+    /**
+     * Calculate how far the message has traveled since transmission.
+     * Returns a fraction 0.0 to 1.0 (though in reality it'll be near 0 for stars).
+     */
+    fun getJourneyProgress(msg: StarMessage): Double {
+        val elapsedMillis = System.currentTimeMillis() - msg.transmissionTime
+        val elapsedYears = elapsedMillis / (1000.0 * 60 * 60 * 24 * 365.25)
+        val totalYears = msg.estimatedArrivalYears ?: return 0.0
+        if (totalYears <= 0) return 1.0
+        return (elapsedYears / totalYears).coerceIn(0.0, 1.0)
+    }
+
+    /**
+     * Get distance traveled in light-years.
+     */
+    fun getDistanceTraveled(msg: StarMessage): Double {
+        val elapsedMillis = System.currentTimeMillis() - msg.transmissionTime
+        val elapsedYears = elapsedMillis / (1000.0 * 60 * 60 * 24 * 365.25)
+        return elapsedYears // traveling at speed of light = 1 ly/year
+    }
+
+    /**
+     * Format distance for display.
+     */
+    fun formatDistance(lightYears: Double): String {
+        return when {
+            lightYears < 0.0000001 -> "${(lightYears * 365.25 * 24 * 3600 * 299792.458).toLong()} km"
+            lightYears < 0.00001 -> "${(lightYears * 365.25 * 24 * 60 * 60).toInt()} light-sec"
+            lightYears < 0.01 -> "${(lightYears * 365.25 * 24).toInt()} light-hours"
+            lightYears < 1 -> "${(lightYears * 365.25).toInt()} light-days"
+            lightYears < 1000 -> "${String.format("%.2f", lightYears)} light-years"
+            lightYears < 1000000 -> "${String.format("%.1f", lightYears / 1000)}k light-years"
+            else -> "${String.format("%.1f", lightYears / 1000000)}M light-years"
+        }
     }
 }
